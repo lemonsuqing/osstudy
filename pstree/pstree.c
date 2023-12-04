@@ -5,29 +5,58 @@
 #include <dirent.h>//使用opendir和readdir函数
 #include <string.h>
 
+int nflag=0,pflag=0,vflag=0;
+
+struct option long_options[]={
+  {"show-pids", no_argument, &pflag, 1},
+	{"numeric-sort", no_argument, &nflag, 1},
+	{"version", no_argument, &vflag, 1},
+	{0, 0, 0, 0}
+};
+
+void Print(void);
+
 int main(int argc, char *argv[]) {
-  char* key_s[2];
-  key_s[0] = argv[1];
-  key_s[1] = argv[2];
-  char c = argv[2][1];
-  if(strcmp(key_s[0],"pstree") == 0){
-    //printf("the argv[1] = %s\n", key_s[0]);
-    //printf("the argv[2] = %s\n", key_s[1]);
+  
+  char c;
+  if (strcmp(argv[1], "pstree") != 0) {
+    printf("If you want to query the process tree, output the 'pstree' command.\nIf it's not querying the process tree, then I can't help you.\n");
+    //如果你想查询进程树，请输出‘pstree’指令。\n如果不是查询进程树，那我帮不了你。
+    return 1;
+}
+
+  while((c = getopt_long(argc, argv, "npV", long_options, NULL)) != -1){
     switch(c){
       case 'n':
-        printf("pstree -n\n");
+        nflag=1;
         break;
       case 'p':
-        printf("pstree -p\n");
+        pflag=1;
         break;
       case 'V':
-        printf("pstree -V\n");
+        vflag=1;
         break;
+      case 0:
+        break;//若是flag字段表示NULL时，getopt_long()会返回0，啥也不做。
+      case '?':
+        printf("not this option:%s\n",argv[optind-1]);//当getopt_long()函数遇到一个未知的选项时，它会返回'?'
+        //这时输出未知选项.
+        return 1;
       default:
         printf("not this program\n");
         break;
     }
   }
+  Print();
   assert(!argv[argc]);
   return 0;
+}
+
+void Print(){
+  if(nflag)
+    printf("pstree -n\n");
+  if(pflag)
+    printf("pstree -p\n");
+  if(vflag)
+    printf("pstree -V\n");
 }
