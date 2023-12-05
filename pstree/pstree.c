@@ -14,10 +14,13 @@ struct option long_options[]={
 	{0, 0, 0, 0}
 };
 
+void pstree_n(void);
+void pstree_p(void);
+void pstree_V(void);
+
 void Print(void);
 
 int main(int argc, char *argv[]) {
-  
   char c;
   if (strcmp(argv[1], "pstree") != 0) {
     printf("If you want to query the process tree, output the 'pstree' command.\nIf it's not querying the process tree, then I can't help you.\n");
@@ -48,15 +51,60 @@ int main(int argc, char *argv[]) {
     }
   }
   Print();
-  assert(!argv[argc]);
+
+  DIR *dirp;
+  struct dirent *dp,*ptr;
+  FILE *fp;
+  char filepath[512];
+  char procname[256];
+
+  
+  dirp = opendir("/proc");
+  if (dirp == NULL) {
+      perror("Failed to open directory \"/proc\"");
+      return 1;
+  }
+
+  printf("PID\n");
+  while ((dp = readdir(dirp)) != NULL) {
+      if (dp->d_type == DT_DIR && dp->d_name[0] >= '0' && dp->d_name[0] <= '9') {
+          //printf("%s\n", dp->d_name);
+          // 打开/proc/[PID]/status文件
+          snprintf(filepath, sizeof(filepath), "/proc/%s/status", dp->d_name); 
+          fp = fopen(filepath, "r");
+          if (fp != NULL) {
+              // 读取进程名称
+              fscanf(fp, "Name:\t%s", procname);
+              printf("%s(%s)\n", procname, dp->d_name);
+              fclose(fp);
+          }
+      }
+  }
+
+  closedir(dirp);
+
+  assert(argv[argc] == NULL);
   return 0;
 }
 
 void Print(){
-  if(nflag)
-    printf("pstree -n\n");
-  if(pflag)
-    printf("pstree -p\n");
-  if(vflag)
-    printf("pstree -V\n");
+  if(nflag){
+    pstree_n();
+  }
+  if(pflag){
+    pstree_p();
+  }
+  if(vflag){
+    pstree_V();
+  }
+}
+
+void pstree_n(void){
+  printf("pstree -n\n");
+}
+void pstree_p(void){
+  printf("pstree -p\n");
+}
+void pstree_V(void){
+  printf("pstree -V\n");
 }
