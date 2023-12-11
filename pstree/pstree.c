@@ -150,6 +150,7 @@ int main(int argc, char *argv[]) {
             }
       }
   }
+  
 
   closedir(dirp);
   printf("Total proc: %d\n",count);
