@@ -62,15 +62,15 @@ void printProc(Proc* proc, int level) {
         flag = 0;
     } else {
         for (int i = 0; i < level; i++) {
-            printf("  ");
+            printf("       ");
         }
         printf("|\n");
     }
     for (int i = 0; i < level; i++) {
-    printf("  ");
+        printf("       ");
     }
     if (level > 0) {
-        printf("+--");
+        printf("+----");
     }
     if(pflag)
       printf("%s(%d)\n", proc->procName, proc->Pid);
